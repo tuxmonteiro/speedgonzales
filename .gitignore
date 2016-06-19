@@ -6,6 +6,7 @@
 *.o
 *.a
 *.so
+vendor/**
 
 # Folders
 _obj
@@ -82,7 +83,8 @@ fabric.properties
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
