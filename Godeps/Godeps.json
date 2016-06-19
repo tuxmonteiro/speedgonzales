@@ -1,0 +1,42 @@
+{
+	"ImportPath": "github.com/tuxmonteiro/speedgonzales",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v74",
+	"Deps": [
+		{
+			"ImportPath": "github.com/klauspost/compress/flate",
+			"Comment": "v1.0-12-g14eb9c4",
+			"Rev": "14eb9c4951195779ecfbec34431a976de7335b0a"
+		},
+		{
+			"ImportPath": "github.com/klauspost/compress/gzip",
+			"Comment": "v1.0-12-g14eb9c4",
+			"Rev": "14eb9c4951195779ecfbec34431a976de7335b0a"
+		},
+		{
+			"ImportPath": "github.com/klauspost/compress/zlib",
+			"Comment": "v1.0-12-g14eb9c4",
+			"Rev": "14eb9c4951195779ecfbec34431a976de7335b0a"
+		},
+		{
+			"ImportPath": "github.com/klauspost/cpuid",
+			"Comment": "v1.0",
+			"Rev": "09cded8978dc9e80714c4d85b0322337b0a1e5e0"
+		},
+		{
+			"ImportPath": "github.com/klauspost/crc32",
+			"Comment": "v1.0",
+			"Rev": "19b0b332c9e4516a6370a0456e6182c3b5036720"
+		},
+		{
+			"ImportPath": "github.com/valyala/fasthttp",
+			"Comment": "v20160617-1-g29a4c4d",
+			"Rev": "29a4c4d6c1764a7986e68ab18c4b83f0e08c2df8"
+		},
+		{
+			"ImportPath": "github.com/valyala/fasthttp/fasthttputil",
+			"Comment": "v20160617-1-g29a4c4d",
+			"Rev": "29a4c4d6c1764a7986e68ab18c4b83f0e08c2df8"
+		}
+	]
+}
