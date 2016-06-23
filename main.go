@@ -2,19 +2,16 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"log"
-	"sync"
-
 	"github.com/valyala/fasthttp"
+	"log"
+	"time"
 )
 
 var (
 	listenAddrs          = flag.String("listenAddrs", ":8098", "A list of TCP addresses to listen to HTTP requests. Leave empty if you don't need http")
 	maxIdleUpstreamConns = flag.Int("maxIdleUpstreamConns", 50, "The maximum idle connections to upstream host")
 	upstreamHost         = flag.String("upstreamHost", "www.google.com", "Upstream host to proxy data from. May include port in the form 'host:port'")
-	upstreamProtocol     = flag.String("upstreamProtocol", "http", "Use this protocol when talking to the upstream")
-	useClientRequestHost = flag.Bool("useClientRequestHost", false, "If set to true, then use 'Host' header from client requests in requests to upstream host. Otherwise use upstreamHost as a 'Host' header in upstream requests")
+	compress             = flag.Bool("compress", false, "Whether to enable transparent response compression")
 )
 
 var upstreamClient *fasthttp.HostClient
@@ -22,12 +19,7 @@ var upstreamClient *fasthttp.HostClient
 func main() {
 	flag.Parse()
 
-	upstreamHostBytes = []byte(*upstreamHost)
-
-	upstreamClient = &fasthttp.HostClient{
-		Addr:     *upstreamHost,
-		MaxConns: *maxIdleUpstreamConns,
-	}
+	upstreamClient = newClient()
 
 	h := requestHandler
 	if *compress {
@@ -39,42 +31,21 @@ func main() {
 	}
 }
 
-var keyPool sync.Pool
-
 func requestHandler(ctx *fasthttp.RequestCtx) {
 
-	var req fasthttp.Request
-	var resp fasthttp.Response
-
-	h := &ctx.Request.Header
-	upstreamUrl := fmt.Sprintf("%s://%s%s", *upstreamProtocol, *upstreamHost, h.RequestURI())
-	req.SetRequestURI(upstreamUrl)
-
-	err := upstreamClient.Do(&req, &resp)
+	err := upstreamClient.DoTimeout(&ctx.Request, &ctx.Response, 15 * time.Second)
 	if err != nil {
 		ctx.Error("Bad Gateway", fasthttp.StatusBadGateway)
+		log.Print(err)
 		return
 	}
 
-	v := keyPool.Get()
-	if v == nil {
-		v = make([]byte, 128)
-	}
-	key := v.([]byte)
-	key = append(key[:0], getRequestHost(h)...)
-	key = append(key, ctx.RequestURI()...)
-	keyPool.Put(v)
-
-	rh := &ctx.Response.Header
-
-	ctx.Success(contentType, buf)
 }
 
-var upstreamHostBytes []byte
-
-func getRequestHost(h *fasthttp.RequestHeader) []byte {
-	if *useClientRequestHost {
-		return h.Host()
+func newClient() *fasthttp.HostClient {
+	return &fasthttp.HostClient{
+		Addr:                          *upstreamHost,
+		MaxConns:                      *maxIdleUpstreamConns,
+		DisableHeaderNamesNormalizing: true,
 	}
-	return upstreamHostBytes
 }
